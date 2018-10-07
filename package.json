@@ -1,0 +1,14 @@
+{
+  "name": "Van",
+  "description": ":eyes:",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "11.1.0",
+    "jimp": "0.5.3",
+    "ms": "2.1.1"
+  }
+}
