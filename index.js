@@ -9,7 +9,7 @@ client.on("ready", () => {
    afk: false,
    status: 'online',
    game: { 
-      name: "the road.", 
+      name: "everything.", 
       type: 3,
       url: "https://twitch.com/"
   }
@@ -81,6 +81,6 @@ client.on('message', msg => {
 	};
 	});
 
-client.login('NDczMDM5ODEzOTM5ODIyNTkz.Dml-7g.w-o5g9gUvu9GhsORh-qAxtTSyKE');
+client.login('');
     
     
