@@ -4,6 +4,7 @@ const ms = require("ms");
 
 const client = new Discord.Client();
 
+const commonTimeout = ms("3s");
 var discordFontPromise;
 
 client.on("ready", () => { 
@@ -32,35 +33,37 @@ const handleFontLoadingFailure = function() {
 client.on("guildMemberAdd", member => {
     var channel = member.guild.channels.find("name", "greetings");
 
-	Jimp.read("./images/welcome/wbg.png", function(err, lenna) {
-        if (err) throw err;
-        discordFontPromise.then(function(font) {
-            lenna.print(font, 50, 250, member.user.tag)
+	Jimp.read("./images/welcome/wbg.png").then(lenna => {
+        return discordFontPromise.then(font => {
+            return lenna.print(font, 50, 250, member.user.tag)
             .print(font, 50, 380, `You are the ${channel.guild.memberCount}th member!`)
             .write("./images/welcome/welcome.png"); 
         }, handleFontLoadingFailure);
+    }, err => {
+        console.error(err);
     });
 
     setTimeout(function() {
         channel.sendFile("./images/welcome/welcome.png");
-    }, ms("3s"));
+    }, commonTimeout);
 });
 
 client.on("guildMemberRemove", member => {		
     var channel = member.guild.channels.find("name", "greetings");
 
-    Jimp.read("./images/welcome/bbg.png", function(err, lenna) {
-        if (err) throw err;
-        discordFontPromise.then(function(font) {
-            lenna.print(font, 50, 250, member.user.tag)
+    Jimp.read("./images/welcome/bbg.png").then(lenna => {
+        return discordFontPromise.then(font => {
+            return lenna.print(font, 50, 250, member.user.tag)
             .print(font, 50, 380, "We hope to see you soon!")
             .write("./images/welcome/goodbye.png"); 
         }, handleFontLoadingFailure);
+    }, err => {
+        console.error(err);
     });
 
     setTimeout(function() {
         channel.sendFile("./images/welcome/goodbye.png");
-    }, ms("3s"));
+    }, commonTimeout);
 });
 
 client.on("message", msg => { 
@@ -68,18 +71,19 @@ client.on("message", msg => {
 		msg.reply("Pong!"); 
 	} 
 	if (msg.content === "!generator") {
-		Jimp.read("./images/welcome/bbg.png", function(err, lenna) {
-            if (err) throw err;
-            discordFontPromise.then(function(font) {
-                lenna.print(font, 50, 250, "noob#0000")
+		Jimp.read("./images/welcome/bbg.png").then(lenna => {
+            return discordFontPromise.then(font => {
+                return lenna.print(font, 50, 250, "noob#0000")
                 .print(font, 50, 380, `You are the ${msg.guild.memberCount}th member!`)
                 .write("./images/welcome/goodbye.png"); 
             }, handleFontLoadingFailure);
+        }, err => {
+            console.error(err);
         });
 
         setTimeout(function() {
             msg.channel.sendFile("./images/welcome/goodbye.png");
-        }, ms("3s"));
+        }, commonTimeout);
 	};
 });
 
