@@ -24,6 +24,11 @@ function loadDiscordFont() {
     discordFontPromise = Jimp.loadFont("./fonts/welcome/discordfont.fnt");
 }
 
+const handleFontLoadingFailure = function() {
+    console.error("Failed to load font, retrying...");
+    loadDiscordFont();
+}
+
 client.on("guildMemberAdd", member => {
     var channel = member.guild.channels.find("name", "greetings");
 
@@ -33,7 +38,7 @@ client.on("guildMemberAdd", member => {
             lenna.print(font, 50, 250, member.user.tag)
             .print(font, 50, 380, `You are the ${channel.guild.memberCount}th member!`)
             .write("./images/welcome/welcome.png"); 
-        });
+        }, handleFontLoadingFailure);
     });
 
     setTimeout(function() {
@@ -50,7 +55,7 @@ client.on("guildMemberRemove", member => {
             lenna.print(font, 50, 250, member.user.tag)
             .print(font, 50, 380, "We hope to see you soon!")
             .write("./images/welcome/goodbye.png"); 
-        });
+        }, handleFontLoadingFailure);
     });
 
     setTimeout(function() {
@@ -69,7 +74,7 @@ client.on("message", msg => {
                 lenna.print(font, 50, 250, "noob#0000")
                 .print(font, 50, 380, `You are the ${msg.guild.memberCount}th member!`)
                 .write("./images/welcome/goodbye.png"); 
-            });
+            }, handleFontLoadingFailure);
         });
 
         setTimeout(function() {
