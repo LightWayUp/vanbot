@@ -22,10 +22,9 @@ client.on("guildMemberAdd", member => {
 
 	Jimp.read("./images/welcome/wbg.png", function(err, lenna) {
         if (err) throw err;
-        lenna.write("./images/welcome/welcome.png"); 
         Jimp.loadFont("./fonts/welcome/discordfont.fnt").then(function(font) {
-            lenna.print(font, 50, 250, member.user.tag);
-            lenna.print(font, 50, 380, `You are the ${channel.guild.memberCount}th member!`)
+            lenna.print(font, 50, 250, member.user.tag)
+            .print(font, 50, 380, `You are the ${channel.guild.memberCount}th member!`)
             .write("./images/welcome/welcome.png"); 
         });
     });
@@ -40,10 +39,9 @@ client.on("guildMemberRemove", member => {
 
     Jimp.read("./images/welcome/bbg.png", function(err, lenna) {
         if (err) throw err;
-        lenna.write("./images/welcome/goodbye.png"); 
         Jimp.loadFont("./fonts/welcome/discordfont.fnt").then(function(font) {
-            lenna.print(font, 50, 250, member.user.tag);
-            lenna.print(font, 50, 380, "We hope to see you soon!")
+            lenna.print(font, 50, 250, member.user.tag)
+            .print(font, 50, 380, "We hope to see you soon!")
             .write("./images/welcome/goodbye.png"); 
         });
     });
@@ -60,10 +58,9 @@ client.on("message", msg => {
 	if (msg.content === "!generator") {
 		Jimp.read("./images/welcome/bbg.png", function(err, lenna) {
             if (err) throw err;
-            lenna.write("./images/welcome/goodbye.png"); 
             Jimp.loadFont("./fonts/welcome/discordfont.fnt").then(function(font) {
-                lenna.print(font, 50, 250, "noob#0000");
-                lenna.print(font, 50, 380, `You are the ${msg.guild.memberCount}th member!`)
+                lenna.print(font, 50, 250, "noob#0000")
+                .print(font, 50, 380, `You are the ${msg.guild.memberCount}th member!`)
                 .write("./images/welcome/goodbye.png"); 
             });
         });
