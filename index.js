@@ -85,22 +85,33 @@ client.on("guildMemberRemove", member => {
     }, commonTimeout);
 });
 
-client.on("message", msg => { 
-	if (msg.content === "!ping") { 
-		msg.reply("Pong!"); 
-	} 
-	if (msg.content === "!generator") {
-        const outFilePath = "./images/welcome/goodbye.png";
+client.on("message", msg => {
+    const content = msg.content;
+    if (!content.startsWith("!")) {
+        return;
+    }
+    switch (content.substring(1).toLowerCase()) {
+        case "ping": {
+            msg.reply("Pong!");
+            break;
+        }
+        case "generator": {
+            const outFilePath = "./images/welcome/goodbye.png";
 
-        createPrintedImage("./images/welcome/bbg.png",
-            outFilePath,
-            new PrintData(commonLeftPadding, commonTopPadding, "noob#0000"),
-            new PrintData(commonLeftPadding, commonTopPadding + 130, `You are the ${msg.guild.memberCount}th member!`));
+            createPrintedImage("./images/welcome/bbg.png",
+                outFilePath,
+                new PrintData(commonLeftPadding, commonTopPadding, "noob#0000"),
+                new PrintData(commonLeftPadding, commonTopPadding + 130, `You are the ${msg.guild.memberCount}th member!`));
 
-        setTimeout(() => {
-            msg.channel.sendFile(outFilePath);
-        }, commonTimeout);
-	};
+            setTimeout(() => {
+                msg.channel.sendFile(outFilePath);
+            }, commonTimeout);
+            break;
+        }
+        default: {
+            // Unknown command, ignores
+        }
+    }
 });
 
 client.login("process.env.BOT_TOKEN");
