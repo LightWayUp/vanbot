@@ -5,6 +5,8 @@ const ms = require("ms");
 const client = new Discord.Client();
 
 const commonTimeout = ms("3s");
+const commonLeftPadding = 50;
+const commonTopPadding = 250;
 var discordFontPromise;
 
 client.on("ready", () => { 
@@ -25,44 +27,61 @@ function loadDiscordFont() {
     discordFontPromise = Jimp.loadFont("./fonts/welcome/discordfont.fnt");
 }
 
-const handleFontLoadingFailure = function() {
+const handleFontLoadingFailure = () => {
     console.error("Failed to load font, retrying...");
     loadDiscordFont();
 }
 
-client.on("guildMemberAdd", member => {
-    var channel = member.guild.channels.find("name", "greetings");
+function PrintData(xAxis, yAxis, printString) {
+    if (typeof xAxis !== "number" || typeof yAxis !== "number" || typeof printString !== "string") {
+        throw new TypeError("Incorrect type(s)!");
+    }
+    this.xAxis = xAxis;
+    this.yAxis = yAxis;
+    this.printString = printString;
+}
 
-	Jimp.read("./images/welcome/wbg.png").then(lenna => {
+function createPrintedImage(readDestination, writeDestination, ...printDatas) {
+    Jimp.read(readDestination).then(image => {
         return discordFontPromise.then(font => {
-            return lenna.print(font, 50, 250, member.user.tag)
-            .print(font, 50, 380, `You are the ${channel.guild.memberCount}th member!`)
-            .write("./images/welcome/welcome.png"); 
+            for (const printData of printDatas) {
+                if (!(printData instanceof PrintData)) {
+                    throw new TypeError("Arguments of rest parameters of function createPrintedImage must be instances of PrintData!");
+                }
+                image.print(font, printData.xAxis, printData.yAxis, printData.printString);
+            }
+            image.write(writeDestination);
         }, handleFontLoadingFailure);
     }, err => {
         console.error(err);
     });
+}
 
-    setTimeout(function() {
-        channel.sendFile("./images/welcome/welcome.png");
+client.on("guildMemberAdd", member => {
+    const channel = member.guild.channels.find("name", "greetings");
+    const outFilePath = "./images/welcome/welcome.png";
+
+    createPrintedImage("./images/welcome/wbg.png",
+        outFilePath,
+        new PrintData(commonLeftPadding, commonTopPadding, member.user.tag),
+        new PrintData(commonLeftPadding, commonTopPadding + 130, `You are the ${channel.guild.memberCount}th member!`));
+
+    setTimeout(() => {
+        channel.sendFile(outFilePath);
     }, commonTimeout);
 });
 
 client.on("guildMemberRemove", member => {		
-    var channel = member.guild.channels.find("name", "greetings");
+    const channel = member.guild.channels.find("name", "greetings");
+    const outFilePath = "./images/welcome/goodbye.png";
 
-    Jimp.read("./images/welcome/bbg.png").then(lenna => {
-        return discordFontPromise.then(font => {
-            return lenna.print(font, 50, 250, member.user.tag)
-            .print(font, 50, 380, "We hope to see you soon!")
-            .write("./images/welcome/goodbye.png"); 
-        }, handleFontLoadingFailure);
-    }, err => {
-        console.error(err);
-    });
+    createPrintedImage("./images/welcome/bbg.png",
+        outFilePath,
+        new PrintData(commonLeftPadding, commonTopPadding, member.user.tag),
+        new PrintData(commonLeftPadding, commonTopPadding + 130, "We hope to see you soon!"));
 
-    setTimeout(function() {
-        channel.sendFile("./images/welcome/goodbye.png");
+    setTimeout(() => {
+        channel.sendFile(outFilePath);
     }, commonTimeout);
 });
 
@@ -71,18 +90,15 @@ client.on("message", msg => {
 		msg.reply("Pong!"); 
 	} 
 	if (msg.content === "!generator") {
-		Jimp.read("./images/welcome/bbg.png").then(lenna => {
-            return discordFontPromise.then(font => {
-                return lenna.print(font, 50, 250, "noob#0000")
-                .print(font, 50, 380, `You are the ${msg.guild.memberCount}th member!`)
-                .write("./images/welcome/goodbye.png"); 
-            }, handleFontLoadingFailure);
-        }, err => {
-            console.error(err);
-        });
+        const outFilePath = "./images/welcome/goodbye.png";
 
-        setTimeout(function() {
-            msg.channel.sendFile("./images/welcome/goodbye.png");
+        createPrintedImage("./images/welcome/bbg.png",
+            outFilePath,
+            new PrintData(commonLeftPadding, commonTopPadding, "noob#0000"),
+            new PrintData(commonLeftPadding, commonTopPadding + 130, `You are the ${msg.guild.memberCount}th member!`));
+
+        setTimeout(() => {
+            msg.channel.sendFile(outFilePath);
         }, commonTimeout);
 	};
 });
