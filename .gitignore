@@ -1,0 +1,5 @@
+# Cache and additional info
+Thumbs.db
+.cache/
+Desktop.ini
+.DS_Store
