@@ -54,11 +54,6 @@ function loadDiscordFont() {
     discordFontPromise = Jimp.loadFont("./fonts/welcome/discordfont.fnt");
 }
 
-const handleFontLoadingFailure = () => {
-    console.error("Failed to load font, retrying...");
-    loadDiscordFont();
-}
-
 function PrintData(xAxis, yAxis, printString) {
     if (typeof xAxis !== "number" || typeof yAxis !== "number" || typeof printString !== "string") {
         throw new TypeError("Incorrect type(s) for PrintData arguments!");
@@ -81,7 +76,10 @@ function createPrintedImage(readDestination, writeDestination, ...printDatas) {
                 image.print(font, printData.xAxis, printData.yAxis, printData.printString);
             }
             image.write(writeDestination);
-        }, handleFontLoadingFailure);
+        }, error => {
+            console.error(`Failed to load font, retrying...\nError: ${error}`);
+            loadDiscordFont();
+        });
     }, err => console.error(err));
 }
 
