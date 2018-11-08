@@ -61,7 +61,7 @@ const handleFontLoadingFailure = () => {
 
 function PrintData(xAxis, yAxis, printString) {
     if (typeof xAxis !== "number" || typeof yAxis !== "number" || typeof printString !== "string") {
-        throw new TypeError("Incorrect type(s)!");
+        throw new TypeError("Incorrect type(s) for PrintData arguments!");
     }
     this.xAxis = xAxis;
     this.yAxis = yAxis;
@@ -69,6 +69,9 @@ function PrintData(xAxis, yAxis, printString) {
 }
 
 function createPrintedImage(readDestination, writeDestination, ...printDatas) {
+    if (typeof readDestination !== "string" || typeof writeDestination !== "string") {
+        throw new TypeError("Incorrect type(s) for createPrintedImage arguments!");
+    }
     Jimp.read(readDestination).then(image => {
         return discordFontPromise.then(font => {
             for (const printData of printDatas) {
@@ -79,9 +82,7 @@ function createPrintedImage(readDestination, writeDestination, ...printDatas) {
             }
             image.write(writeDestination);
         }, handleFontLoadingFailure);
-    }, err => {
-        console.error(err);
-    });
+    }, err => console.error(err));
 }
 
 client.on("guildMemberAdd", member => {
@@ -93,9 +94,7 @@ client.on("guildMemberAdd", member => {
         new PrintData(commonLeftPadding, commonTopPadding, member.user.tag),
         new PrintData(commonLeftPadding, commonTopPadding + 130, `You are the ${channel.guild.memberCount}th member!`));
 
-    setTimeout(() => {
-        channel.sendFile(outFilePath);
-    }, commonTimeout);
+    setTimeout(() => channel.sendFile(outFilePath), commonTimeout);
 });
 
 client.on("guildMemberRemove", member => {		
@@ -107,9 +106,7 @@ client.on("guildMemberRemove", member => {
         new PrintData(commonLeftPadding, commonTopPadding, member.user.tag),
         new PrintData(commonLeftPadding, commonTopPadding + 130, "We hope to see you soon!"));
 
-    setTimeout(() => {
-        channel.sendFile(outFilePath);
-    }, commonTimeout);
+    setTimeout(() => channel.sendFile(outFilePath), commonTimeout);
 });
 
 client.on("message", msg => {
@@ -130,9 +127,7 @@ client.on("message", msg => {
                 new PrintData(commonLeftPadding, commonTopPadding, "noob#0000"),
                 new PrintData(commonLeftPadding, commonTopPadding + 130, `You are the ${msg.guild.memberCount}th member!`));
 
-            setTimeout(() => {
-                msg.channel.sendFile(outFilePath);
-            }, commonTimeout);
+            setTimeout(() => msg.channel.sendFile(outFilePath), commonTimeout);
             break;
         }
         default: {
