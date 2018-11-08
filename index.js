@@ -30,7 +30,7 @@ const Jimp = require("jimp");
 const ms = require("ms");
 
 const client = new Discord.Client();
-
+const prefix = "!";
 const commonTimeout = ms("3s");
 const commonLeftPadding = 50;
 const commonTopPadding = 250;
@@ -119,10 +119,10 @@ client.on("guildMemberRemove", member => {
 
 client.on("message", msg => {
     const content = msg.content;
-    if (!content.startsWith("!")) {
+    if (!content.startsWith(prefix)) {
         return;
     }
-    switch (content.substring(1).toLowerCase()) {
+    switch (content.substring(prefix.length).toLowerCase()) {
         case "ping": {
             msg.reply("Pong!");
             break;
