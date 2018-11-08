@@ -87,6 +87,10 @@ function createPrintedImage(readDestination, writeDestination, ...printDatas) {
 
 client.on("guildMemberAdd", member => {
     const channel = member.guild.channels.find("name", "greetings");
+    if (channel === undefined) { // Can't find greetings channel
+        console.error(`No channel is named "greetings" in guild ${guild.name}!`);
+        return;
+    }
     const outFilePath = "./images/welcome/welcome.png";
 
     createPrintedImage("./images/welcome/wbg.png",
@@ -99,6 +103,10 @@ client.on("guildMemberAdd", member => {
 
 client.on("guildMemberRemove", member => {		
     const channel = member.guild.channels.find("name", "greetings");
+    if (channel === undefined) { // Can't find greetings channel
+        console.error(`No channel is named "greetings" in guild ${guild.name}!`);
+        return;
+    }
     const outFilePath = "./images/welcome/goodbye.png";
 
     createPrintedImage("./images/welcome/bbg.png",
