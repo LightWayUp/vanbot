@@ -76,8 +76,8 @@ client.on("ready", () => {
         status: "online",
         game: { 
             name: "everything.", 
-            type: 3,
-            url: "https://twitch.com/"
+            type: "WATCHING",
+            url: "https://www.twitch.tv/"
         }
     });
     loadDiscordFont();
