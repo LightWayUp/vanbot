@@ -36,20 +36,6 @@ const commonLeftPadding = 50;
 const commonTopPadding = 250;
 var discordFontPromise;
 
-client.on("ready", () => { 
-    console.log(`Logged in as ${client.user.tag}!`);
-    client.user.setPresence({
-        afk: false,
-        status: "online",
-        game: { 
-            name: "everything.", 
-            type: 3,
-            url: "https://twitch.com/"
-        }
-    });
-    loadDiscordFont();
-});
-
 function loadDiscordFont() {
     discordFontPromise = Jimp.loadFont("./fonts/welcome/discordfont.fnt");
 }
@@ -83,7 +69,19 @@ function createPrintedImage(readDestination, writeDestination, ...printDatas) {
     }, err => console.error(err));
 }
 
-client.on("guildMemberAdd", member => {
+client.on("ready", () => { 
+    console.log(`Logged in as ${client.user.tag}!`);
+    client.user.setPresence({
+        afk: false,
+        status: "online",
+        game: { 
+            name: "everything.", 
+            type: 3,
+            url: "https://twitch.com/"
+        }
+    });
+    loadDiscordFont();
+}).on("guildMemberAdd", member => {
     const channel = member.guild.channels.find("name", "greetings");
     if (channel === undefined) { // Can't find greetings channel
         console.error(`No channel is named "greetings" in guild ${guild.name}!`);
@@ -97,9 +95,7 @@ client.on("guildMemberAdd", member => {
         new PrintData(commonLeftPadding, commonTopPadding + 130, `You are the ${channel.guild.memberCount}th member!`));
 
     setTimeout(() => channel.sendFile(outFilePath), commonTimeout);
-});
-
-client.on("guildMemberRemove", member => {		
+}).on("guildMemberRemove", member => {		
     const channel = member.guild.channels.find("name", "greetings");
     if (channel === undefined) { // Can't find greetings channel
         console.error(`No channel is named "greetings" in guild ${guild.name}!`);
@@ -113,9 +109,7 @@ client.on("guildMemberRemove", member => {
         new PrintData(commonLeftPadding, commonTopPadding + 130, "We hope to see you soon!"));
 
     setTimeout(() => channel.sendFile(outFilePath), commonTimeout);
-});
-
-client.on("message", msg => {
+}).on("message", msg => {
     const content = msg.content;
     if (!content.startsWith(prefix)) {
         return;
@@ -140,6 +134,4 @@ client.on("message", msg => {
             // Unknown command, ignores
         }
     }
-});
-
-client.login(process.env.BOT_TOKEN);
+}).login(process.env.BOT_TOKEN);
