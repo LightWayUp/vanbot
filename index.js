@@ -30,38 +30,19 @@ const Jimp = require("jimp");
 const ms = require("ms");
 
 const client = new Discord.Client();
-
+const prefix = "!";
 const commonTimeout = ms("3s");
 const commonLeftPadding = 50;
 const commonTopPadding = 250;
 var discordFontPromise;
 
-client.on("ready", () => { 
-    console.log(`Logged in as ${client.user.tag}!`);
-    client.user.setPresence({
-        afk: false,
-        status: "online",
-        game: { 
-            name: "everything.", 
-            type: 3,
-            url: "https://twitch.com/"
-        }
-    });
-    loadDiscordFont();
-});
-
 function loadDiscordFont() {
     discordFontPromise = Jimp.loadFont("./fonts/welcome/discordfont.fnt");
 }
 
-const handleFontLoadingFailure = () => {
-    console.error("Failed to load font, retrying...");
-    loadDiscordFont();
-}
-
 function PrintData(xAxis, yAxis, printString) {
     if (typeof xAxis !== "number" || typeof yAxis !== "number" || typeof printString !== "string") {
-        throw new TypeError("Incorrect type(s)!");
+        throw new TypeError("Incorrect type(s) for PrintData arguments!");
     }
     this.xAxis = xAxis;
     this.yAxis = yAxis;
@@ -69,6 +50,9 @@ function PrintData(xAxis, yAxis, printString) {
 }
 
 function createPrintedImage(readDestination, writeDestination, ...printDatas) {
+    if (typeof readDestination !== "string" || typeof writeDestination !== "string") {
+        throw new TypeError("Incorrect type(s) for createPrintedImage arguments!");
+    }
     Jimp.read(readDestination).then(image => {
         return discordFontPromise.then(font => {
             for (const printData of printDatas) {
@@ -78,14 +62,31 @@ function createPrintedImage(readDestination, writeDestination, ...printDatas) {
                 image.print(font, printData.xAxis, printData.yAxis, printData.printString);
             }
             image.write(writeDestination);
-        }, handleFontLoadingFailure);
-    }, err => {
-        console.error(err);
-    });
+        }, error => {
+            console.error(`Failed to load font, retrying...\nError: ${error}`);
+            loadDiscordFont();
+        });
+    }, err => console.error(err));
 }
 
-client.on("guildMemberAdd", member => {
+client.on("ready", () => { 
+    console.log(`Logged in as ${client.user.tag}!`);
+    client.user.setPresence({
+        afk: false,
+        status: "online",
+        game: { 
+            name: "everything.", 
+            type: "WATCHING",
+            url: "https://www.twitch.tv/"
+        }
+    });
+    loadDiscordFont();
+}).on("guildMemberAdd", member => {
     const channel = member.guild.channels.find("name", "greetings");
+    if (channel === undefined) { // Can't find greetings channel
+        console.error(`No channel is named "greetings" in guild ${guild.name}!`);
+        return;
+    }
     const outFilePath = "./images/welcome/welcome.png";
 
     createPrintedImage("./images/welcome/wbg.png",
@@ -93,13 +94,13 @@ client.on("guildMemberAdd", member => {
         new PrintData(commonLeftPadding, commonTopPadding, member.user.tag),
         new PrintData(commonLeftPadding, commonTopPadding + 130, `You are the ${channel.guild.memberCount}th member!`));
 
-    setTimeout(() => {
-        channel.sendFile(outFilePath);
-    }, commonTimeout);
-});
-
-client.on("guildMemberRemove", member => {		
+    setTimeout(() => channel.sendFile(outFilePath), commonTimeout);
+}).on("guildMemberRemove", member => {		
     const channel = member.guild.channels.find("name", "greetings");
+    if (channel === undefined) { // Can't find greetings channel
+        console.error(`No channel is named "greetings" in guild ${guild.name}!`);
+        return;
+    }
     const outFilePath = "./images/welcome/goodbye.png";
 
     createPrintedImage("./images/welcome/bbg.png",
@@ -107,17 +108,13 @@ client.on("guildMemberRemove", member => {
         new PrintData(commonLeftPadding, commonTopPadding, member.user.tag),
         new PrintData(commonLeftPadding, commonTopPadding + 130, "We hope to see you soon!"));
 
-    setTimeout(() => {
-        channel.sendFile(outFilePath);
-    }, commonTimeout);
-});
-
-client.on("message", msg => {
+    setTimeout(() => channel.sendFile(outFilePath), commonTimeout);
+}).on("message", msg => {
     const content = msg.content;
-    if (!content.startsWith("!")) {
+    if (!content.startsWith(prefix)) {
         return;
     }
-    switch (content.substring(1).toLowerCase()) {
+    switch (content.substring(prefix.length).toLowerCase()) {
         case "ping": {
             msg.reply("Pong!");
             break;
@@ -130,15 +127,11 @@ client.on("message", msg => {
                 new PrintData(commonLeftPadding, commonTopPadding, "noob#0000"),
                 new PrintData(commonLeftPadding, commonTopPadding + 130, `You are the ${msg.guild.memberCount}th member!`));
 
-            setTimeout(() => {
-                msg.channel.sendFile(outFilePath);
-            }, commonTimeout);
+            setTimeout(() => msg.channel.sendFile(outFilePath), commonTimeout);
             break;
         }
         default: {
             // Unknown command, ignores
         }
     }
-});
-
-client.login("process.env.BOT_TOKEN");
+}).login(process.env.BOT_TOKEN);
