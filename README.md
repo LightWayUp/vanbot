@@ -1,10 +1,18 @@
-# Van [![MIT License](https://img.shields.io/badge/license-MIT-0366d6.svg?longCache=true&style=flat-square)](/LICENSE)
+# VanBot [![MIT License](https://img.shields.io/badge/license-MIT-0366d6.svg?longCache=true&style=flat-square)](/LICENSE) [![Node.js compatibility](https://img.shields.io/badge/node->=8.0.0-026e00.svg?longCache=true&style=flat-square&logo=node.js)](https://nodejs.org/)
 &#x1F440;
+
+VanBot is a Discord bot.
+
+## Commands
+The prefix is `!`.
+
+* `ping` : Get a message from VanBot.
+* `generator` : Generate a sample image of greetings used when a user joins the server.
 
 ## License
 This project is licensed under [MIT License](/LICENSE).
 
-> Copyright (c) 2018 vanished
+> Copyright (c) 2018-2019 vanished
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
