@@ -1,4 +1,4 @@
-# VanBot [![MIT License](https://img.shields.io/badge/license-MIT-0366d6.svg?longCache=true&style=flat-square)](/LICENSE) [![Node.js compatibility](https://img.shields.io/badge/node->=8.0.0-026e00.svg?longCache=true&style=flat-square&logo=node.js)](https://nodejs.org/)
+# VanBot [![MIT License](https://img.shields.io/badge/license-MIT-0366d6.svg?longCache=true&style=flat-square)](/LICENSE) [![Node.js compatibility](https://img.shields.io/badge/node->=10.0.0-026e00.svg?longCache=true&style=flat-square&logo=node.js)](https://nodejs.org/)
 &#x1F440;
 
 VanBot is a Discord bot.

@@ -62,7 +62,15 @@ if (!(Discord && Jimp)) {
  * @listens Discord.Client#event:message
  * @readonly
  */
-const client = new Discord.Client({disableEveryone: true});
+const client = new Discord.Client({
+    disableEveryone: true,
+    presence: {
+        activity: { 
+            name: "everything.", 
+            type: "WATCHING"
+        }
+    }
+});
 
 /**
  * An enum for names of events client can listen to.
@@ -289,8 +297,8 @@ function exit(exitCode) {
         exitCode = 0;
     }
     if (!process.env.WEBSOCKET_DIED) {
-        client.destroy().then(() => console.log("Client has logged out."));
-        console.log("About to set process exit code, process will exit when no more tasks are pending.");
+        client.destroy();
+        console.log("Client has logged out.\nAbout to set process exit code, process will exit when no more tasks are pending.");
         process.exitCode = exitCode;
         return;
     }
@@ -363,18 +371,15 @@ function sendGreetings(member, background, text) {
     createImageBuffer(background,
         new PrintData(COMMON_LEFT_PADDING, getYPadding(0), member.user.tag),
         new PrintData(COMMON_LEFT_PADDING, getYPadding(1), text))
-    .then(buffer => channel.send(new Discord.Attachment(buffer)).catch(console.error))
+    .then(buffer => channel.send(new Discord.MessageAttachment(buffer)).catch(console.error))
     .catch(error => {
         console.error(error);
         channel.send(IMAGE_UNAVAILABLE_MESSAGE).catch(console.error);
     });
 }
 
-client.once(Events.READY, () => {
-    const clientUser = client.user;
-    console.log(`Logged in as ${clientUser.tag}!`);
-    clientUser.setActivity("everything.", {type: "WATCHING"}).catch(console.error);
-}).on(Events.GUILD_MEMBER_ADD, member =>
+client.once(Events.READY, () => console.log(`Logged in as ${client.user.tag}!`))
+.on(Events.GUILD_MEMBER_ADD, member =>
     sendGreetings(member, "./images/welcome/wbg.png", `You are the ${member.guild.memberCount}th member!`)
 ).on(Events.GUILD_MEMBER_REMOVE, member =>
     sendGreetings(member, "./images/welcome/bbg.png", "We hope to see you soon!")
@@ -398,7 +403,7 @@ client.once(Events.READY, () => {
             createImageBuffer("./images/welcome/wbg.png",
                 new PrintData(COMMON_LEFT_PADDING, getYPadding(0), "noob#0000"),
                 new PrintData(COMMON_LEFT_PADDING, getYPadding(1), `You are the ${message.guild.memberCount}th member!`))
-            .then(buffer => channel.send(new Discord.Attachment(buffer)).catch(console.error))
+            .then(buffer => channel.send(new Discord.MessageAttachment(buffer)).catch(console.error))
             .catch(error => {
                 console.error(error);
                 channel.send(IMAGE_UNAVAILABLE_MESSAGE).catch(console.error);

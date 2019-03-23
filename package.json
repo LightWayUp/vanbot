@@ -37,10 +37,10 @@
     "test": "echo \"No test to run\" && exit 0"
   },
   "dependencies": {
-    "discord.js": "^11.4.2",
+    "discord.js": "github:discordjs/discord.js#master",
     "jimp": "^0.6.0"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=10.0.0"
   }
 }
