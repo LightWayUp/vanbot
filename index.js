@@ -89,6 +89,15 @@ process.on("uncaughtException", error => {
 .forEach(signal => process.on(signal, () => exit()));
 
 /**
+ * The url module.
+ * @constant {object}
+ * @readonly
+ * @requires module:url
+ * @see {@link https://nodejs.org/api/url.html|URL}
+ */
+const url = require("url");
+
+/**
  * The "prefix". If a message client receives
  * starts with the prefix, it is potentially a command.
  * @constant {string}
@@ -135,15 +144,18 @@ loadFont("./fonts/welcome/discordfont.fnt", font => discordFont = font);
 /**
  * Load a font, retries indefinitely until the font is
  * successfully loaded or the exit sequence has begun.
- * @param {string|String} pathToFont Path to the fnt file to be loaded.
+ * @param {string|String|URL} pathToFont Path to or URL of the fnt file to be loaded.
  * @param {function} callback Callback function with one argument
  * which is an object representing the loaded font.
  * @throws {TypeError} Arguments must match their documented types respectively.
  */
 function loadFont(pathToFont, callback) {
     pathToFont = unboxIfBoxed(pathToFont);
-    if (!(typeof pathToFont === "string" && typeof callback === "function")) {
+    if (!((typeof pathToFont === "string" || pathToFont instanceof url.URL) && typeof callback === "function")) {
         throw new TypeError("Incorrect type(s) for loadFont arguments!");
+    }
+    if (pathToFont instanceof url.URL) {
+        pathToFont = url.format(pathToFont, {unicode: true});
     }
     Jimp.loadFont(pathToFont).then(font => {
         console.log(`Font from path "${pathToFont}" has been loaded.`);
@@ -205,7 +217,7 @@ class PrintData {
 /**
  * Read an image from the given path, print text,
  * and generate buffer of the modified image.
- * @param {string|String} readDestination The path to read original image from.
+ * @param {string|String|URL} readDestination The path or URL to read original image from.
  * @param {...PrintData} printDatas At least one {@link PrintData} containing
  * text to be printed to the image.
  * @returns {Promise<Buffer>} A Promise that resolves to the buffer of
@@ -216,13 +228,14 @@ class PrintData {
  */
 function createImageBuffer(readDestination, ...printDatas) {
     readDestination = unboxIfBoxed(readDestination);
-    if (!(typeof readDestination === "string" && printDatas.length && printDatas.every(printData => printData instanceof PrintData))) {
+    if (!((typeof readDestination === "string" || readDestination instanceof url.URL) && printDatas.length && printDatas.every(printData => printData instanceof PrintData))) {
         throw new TypeError("Incorrect type(s) for createImageBuffer arguments!");
     }
     if (!discordFont) {
         return Promise.reject(new Error("createImageBuffer is called while font has not been loaded yet!"));
     }
-    return Jimp.read(readDestination).then(image => {
+    return Jimp.read(readDestination instanceof url.URL ? url.format(readDestination, {unicode: true}) : readDestination)
+        .then(image => {
             printDatas.forEach(printData => image.print(discordFont, printData.xAxis, printData.yAxis, printData.printString));
             return image.getBufferAsync(Jimp.MIME_PNG);
         });
@@ -346,14 +359,14 @@ function unboxIfBoxed(object) {
 /**
  * Send a greetings image to #greetings channel.
  * @param {Discord.GuildMember} member The member to greet.
- * @param {string|String} background Path to the background image to be used.
+ * @param {string|String|URL} background Path to or URL of the background image to be used.
  * @param {string|String} text The text to greet the member with.
  * @throws {TypeError} Arguments must match their documented types respectively.
  */
 function sendGreetings(member, background, text) {
     background = unboxIfBoxed(background);
     text = unboxIfBoxed(text);
-    if (!(member instanceof Discord.GuildMember && typeof background === "string" && typeof text === "string")) {
+    if (!(member instanceof Discord.GuildMember && (typeof background === "string" || background instanceof url.URL) && typeof text === "string")) {
         throw new TypeError("Incorrect type(s) for sendGreetings arguments!");
     }
     const greetings = "greetings";
