@@ -142,12 +142,9 @@ loadFont("./fonts/welcome/discordfont.fnt", font => discordFont = font);
  * @throws {TypeError} Arguments must match their documented types respectively.
  */
 function loadFont(pathToFont, callback) {
-    pathToFont = unboxIfBoxed(pathToFont);
-    if (!((typeof pathToFont === "string" || pathToFont instanceof url.URL) && typeof callback === "function")) {
+    pathToFont = pathToFont instanceof url.URL ? url.format(pathToFont, {unicode: true}) : unboxIfBoxed(pathToFont);
+    if (!(typeof pathToFont === "string" && typeof callback === "function")) {
         throw new TypeError("Incorrect type(s) for loadFont arguments!");
-    }
-    if (pathToFont instanceof url.URL) {
-        pathToFont = url.format(pathToFont, {unicode: true});
     }
     Jimp.loadFont(pathToFont).then(font => {
         console.log(`Font from path "${pathToFont}" has been loaded.`);
@@ -219,15 +216,15 @@ class PrintData {
  * @throws {TypeError} Arguments must match their documented types respectively.
  */
 function createImageBuffer(readDestination, ...printDatas) {
-    readDestination = unboxIfBoxed(readDestination);
-    if (!((typeof readDestination === "string" || readDestination instanceof url.URL) && printDatas.length && printDatas.every(printData => printData instanceof PrintData))) {
+    readDestination = readDestination instanceof url.URL ? url.format(readDestination, {unicode: true}) : unboxIfBoxed(readDestination);
+    if (!(typeof readDestination === "string" && printDatas.length &&
+        printDatas.every(printData => printData instanceof PrintData))) {
         throw new TypeError("Incorrect type(s) for createImageBuffer arguments!");
     }
     if (!discordFont) {
         return Promise.reject(new Error("createImageBuffer is called while font has not been loaded yet!"));
     }
-    return Jimp.read(readDestination instanceof url.URL ? url.format(readDestination, {unicode: true}) : readDestination)
-        .then(image => {
+    return Jimp.read(readDestination).then(image => {
             printDatas.forEach(printData => image.print(discordFont, printData.xAxis, printData.yAxis, printData.printString));
             return image.getBufferAsync(Jimp.MIME_PNG);
         });
@@ -358,7 +355,9 @@ function unboxIfBoxed(object) {
 function sendGreetings(member, background, text) {
     background = unboxIfBoxed(background);
     text = unboxIfBoxed(text);
-    if (!(member instanceof Discord.GuildMember && (typeof background === "string" || background instanceof url.URL) && typeof text === "string")) {
+    if (!(member instanceof Discord.GuildMember &&
+        (typeof background === "string" || background instanceof url.URL) &&
+        typeof text === "string")) {
         throw new TypeError("Incorrect type(s) for sendGreetings arguments!");
     }
     const greetings = "greetings";
@@ -394,7 +393,8 @@ client.once(Events.READY, () => {
 ).on(Events.MESSAGE_CREATE, message => {
     const content = message.content;
     const channel = message.channel;
-    if (message.author.bot || !(channel.type === "text" && content.startsWith(PREFIX) && clientHasPermissionInChannel(channel, Permissions.SEND_MESSAGES))) {
+    if (message.author.bot || !(channel.type === "text" && content.startsWith(PREFIX) &&
+        clientHasPermissionInChannel(channel, Permissions.SEND_MESSAGES))) {
         return;
     }
     switch (content.substring(PREFIX.length).toLowerCase().split(/\s+/gi)[0]) {
