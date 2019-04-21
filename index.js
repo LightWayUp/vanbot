@@ -150,7 +150,7 @@ loadFont("./fonts/welcome/discordfont.fnt", font => discordFont = font);
  * @throws {TypeError} Arguments must match their documented types respectively.
  */
 function loadFont(pathToFont, callback) {
-    pathToFont = pathToFont instanceof url.URL ? url.format(pathToFont, {unicode: true}) : unboxIfBoxed(pathToFont);
+    pathToFont = pathToFont instanceof URL ? url.format(pathToFont, {unicode: true}) : unboxIfBoxed(pathToFont);
     if (!(typeof pathToFont === "string" && typeof callback === "function")) {
         throw new TypeError("Incorrect type(s) for loadFont arguments!");
     }
@@ -224,7 +224,7 @@ class PrintData {
  * @throws {TypeError} Arguments must match their documented types respectively.
  */
 function createImageBuffer(readDestination, ...printDatas) {
-    readDestination = readDestination instanceof url.URL ? url.format(readDestination, {unicode: true}) : unboxIfBoxed(readDestination);
+    readDestination = readDestination instanceof URL ? url.format(readDestination, {unicode: true}) : unboxIfBoxed(readDestination);
     if (!(typeof readDestination === "string" && printDatas.length &&
         printDatas.every(printData => printData instanceof PrintData))) {
         throw new TypeError("Incorrect type(s) for createImageBuffer arguments!");
@@ -364,7 +364,7 @@ function sendGreetings(member, background, text) {
     background = unboxIfBoxed(background);
     text = unboxIfBoxed(text);
     if (!(member instanceof Discord.GuildMember &&
-        (typeof background === "string" || background instanceof url.URL) &&
+        (typeof background === "string" || background instanceof URL) &&
         typeof text === "string")) {
         throw new TypeError("Incorrect type(s) for sendGreetings arguments!");
     }
